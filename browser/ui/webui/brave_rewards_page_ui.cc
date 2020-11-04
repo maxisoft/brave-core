@@ -258,8 +258,8 @@ class RewardsDOMHandler : public WebUIMessageHandler,
       const std::string& wallet_type) override;
 
   void OnAdsEnabled(
-    brave_rewards::RewardsService* rewards_service,
-    bool ads_enabled) override;
+      brave_rewards::RewardsService* rewards_service,
+      bool ads_enabled) override;
 
   void OnClaimPromotion(
       const std::string& promotion_id,
@@ -1673,6 +1673,8 @@ void RewardsDOMHandler::OnAdsEnabled(
 
   base::ListValue* emptyArgs = nullptr;
   GetAdsData(emptyArgs);
+  GetAutoContributeProperties(emptyArgs);
+  GetOnboardingStatus(emptyArgs);
 }
 
 void RewardsDOMHandler::OnlyAnonWallet(const base::ListValue* args) {

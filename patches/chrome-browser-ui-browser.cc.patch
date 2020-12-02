@@ -1,7 +1,16 @@
 diff --git a/chrome/browser/ui/browser.cc b/chrome/browser/ui/browser.cc
-index 24954ee7e0e83d40b88884046731b09cbf4cccd0..f59088d81a3ffc103cc2bf1114006c552f56dd15 100644
+index 24954ee7e0e83d40b88884046731b09cbf4cccd0..72c703a3768f211997225ca4ff643b9162e6d92f 100644
 --- a/chrome/browser/ui/browser.cc
 +++ b/chrome/browser/ui/browser.cc
+@@ -427,7 +427,7 @@ Browser* Browser::Create(const CreateParams& params) {
+   if (IsOnKioskSplashScreen())
+     return nullptr;
+ 
+-  return new Browser(params);
++  return new BraveBrowser(params);
+ }
+ 
+ Browser::Browser(const CreateParams& params)
 @@ -438,7 +438,7 @@ Browser::Browser(const CreateParams& params)
        tab_strip_model_delegate_(
            std::make_unique<chrome::BrowserTabStripModelDelegate>(this)),
@@ -11,3 +20,16 @@ index 24954ee7e0e83d40b88884046731b09cbf4cccd0..f59088d81a3ffc103cc2bf1114006c55
                                            params.profile)),
        app_name_(params.app_name),
        is_trusted_source_(params.trusted_source),
+@@ -537,6 +537,12 @@ Browser::Browser(const CreateParams& params)
+ 
+   if (is_focus_mode_)
+     focus_mode_start_time_ = base::TimeTicks::Now();
++
++  // TODO(simonhong): Remove this after c88. Use BraveBrowser instead.
++  if (base::FeatureList::IsEnabled(sidebar::kSidebarFeature) &&
++      is_type_normal()) {
++    sidebar_controller_.reset(new sidebar::SidebarController(profile_));
++  }
+ }
+ 
+ Browser::~Browser() {

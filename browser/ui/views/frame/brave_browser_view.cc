@@ -15,6 +15,15 @@
 #include "ui/events/event_observer.h"
 #include "ui/views/event_monitor.h"
 
+#if BUILDFLAG(ENABLE_SIDEBAR)
+#include "brave/browser/ui/views/frame/brave_contents_layout_manager.h"
+#include "brave/browser/ui/views/sidebar/sidebar_container_view.h"
+#include "brave/components/sidebar/features.h"
+#include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/views/frame/contents_layout_manager.h"
+#include "ui/views/layout/fill_layout.h"
+#endif
+
 #if BUILDFLAG(ENABLE_SPARKLE)
 #include "brave/browser/ui/views/update_recommended_message_box_mac.h"
 #endif
@@ -95,12 +104,44 @@ class BraveBrowserView::TabCyclingEventHandler : public ui::EventObserver,
 };
 
 BraveBrowserView::BraveBrowserView(std::unique_ptr<Browser> browser)
-    : BrowserView(std::move(browser)) {}
+    : BrowserView(std::move(browser)) {
+#if BUILDFLAG(ENABLE_SIDEBAR)
+  if (!base::FeatureList::IsEnabled(sidebar::kSidebarFeature) ||
+      !browser_->is_type_normal()) {
+    return;
+  }
+
+  auto brave_contents_container = std::make_unique<views::View>();
+
+  auto orignal_contents_container = RemoveChildViewT(contents_container_);
+  auto* sidebar_container = brave_contents_container->AddChildView(
+      std::make_unique<SidebarContainerView>(browser_->profile()));
+  original_contents_container_ = brave_contents_container->AddChildView(
+      std::move(orignal_contents_container));
+  brave_contents_container->SetLayoutManager(
+      std::make_unique<BraveContentsLayoutManager>(
+          sidebar_container, original_contents_container_));
+  contents_container_ = AddChildView(std::move(brave_contents_container));
+  set_contents_view(contents_container_);
+#endif
+}
 
 BraveBrowserView::~BraveBrowserView() {
   tab_cycling_event_handler_.reset();
   DCHECK(!tab_cycling_event_handler_);
 }
+
+#if BUILDFLAG(ENABLE_SIDEBAR)
+ContentsLayoutManager* BraveBrowserView::GetContentsLayoutManager() const {
+   if (base::FeatureList::IsEnabled(sidebar::kSidebarFeature) &&
+       browser_->is_type_normal()) {
+    return static_cast<ContentsLayoutManager*>(
+        original_contents_container_->GetLayoutManager());
+  }
+
+  return BrowserView::GetContentsLayoutManager();
+}
+#endif
 
 void BraveBrowserView::SetStarredState(bool is_starred) {
   BookmarkButton* button =

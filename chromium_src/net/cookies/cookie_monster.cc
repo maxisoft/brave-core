@@ -48,8 +48,8 @@ CookieMonster::GetOrCreateEphemeralCookieStoreForTopFrameURL(
     return it->second.get();
 
   return ephemeral_cookie_stores_
-      .emplace(domain,
-               new ChromiumCookieMonster(nullptr /* store */, net_log_.net_log()))
+      .emplace(domain, new ChromiumCookieMonster(nullptr /* store */,
+                                                 net_log_.net_log()))
       .first->second.get();
 }
 
@@ -67,7 +67,7 @@ void CookieMonster::SetCanonicalCookieAsync(
     return;
   }
   ChromiumCookieMonster::SetCanonicalCookieAsync(std::move(cookie), source_url,
-                                               options, std::move(callback));
+                                                 options, std::move(callback));
 }
 
 void CookieMonster::GetCookieListWithOptionsAsync(
@@ -82,12 +82,13 @@ void CookieMonster::GetCookieListWithOptionsAsync(
     return;
   }
   ChromiumCookieMonster::GetCookieListWithOptionsAsync(url, options,
-                                                     std::move(callback));
+                                                       std::move(callback));
 }
 
 void CookieMonster::DeleteCanonicalCookieAsync(const CanonicalCookie& cookie,
                                                DeleteCallback callback) {
-  ChromiumCookieMonster::DeleteCanonicalCookieAsync(cookie, std::move(callback));
+  ChromiumCookieMonster::DeleteCanonicalCookieAsync(cookie,
+                                                    std::move(callback));
 }
 
 void CookieMonster::DeleteAllCreatedInTimeRangeAsync(
@@ -98,7 +99,7 @@ void CookieMonster::DeleteAllCreatedInTimeRangeAsync(
                                                 DeleteCallback());
   }
   ChromiumCookieMonster::DeleteAllCreatedInTimeRangeAsync(creation_range,
-                                                        std::move(callback));
+                                                          std::move(callback));
 }
 
 void CookieMonster::DeleteAllMatchingInfoAsync(CookieDeletionInfo delete_info,
@@ -113,7 +114,7 @@ void CookieMonster::DeleteAllMatchingInfoAsync(CookieDeletionInfo delete_info,
     it.second->DeleteAllMatchingInfoAsync(delete_info, DeleteCallback());
   }
   ChromiumCookieMonster::DeleteAllMatchingInfoAsync(delete_info,
-                                                  std::move(callback));
+                                                    std::move(callback));
 }
 
 void CookieMonster::DeleteSessionCookiesAsync(DeleteCallback callback) {

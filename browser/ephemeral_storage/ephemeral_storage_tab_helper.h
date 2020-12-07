@@ -44,7 +44,7 @@ class EphemeralStorageTabHelper
   friend class content::WebContentsUserData<EphemeralStorageTabHelper>;
   scoped_refptr<content::SessionStorageNamespace> local_storage_namespace_;
   scoped_refptr<content::SessionStorageNamespace> session_storage_namespace_;
-  scoped_refptr<content::TLDEphemeralStorage> tld_ephemeral_storage_;
+  scoped_refptr<content::TLDEphemeralLifetime> tld_ephemeral_lifetime_;
 
   WEB_CONTENTS_USER_DATA_KEY_DECL();
 };

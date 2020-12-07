@@ -104,7 +104,7 @@ void EphemeralStorageTabHelper::CreateEphemeralStorageAreasForDomainAndURL(
   session_storage_namespace_ =
       content::CreateSessionStorageNamespace(partition, session_partition_id);
 
-  tld_ephemeral_storage_ = content::TLDEphemeralStorage::GetOrCreate(
+  tld_ephemeral_lifetime_ = content::TLDEphemeralLifetime::GetOrCreate(
       browser_context, partition, new_domain);
 }
 

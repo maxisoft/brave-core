@@ -46,4 +46,4 @@ bool BrowserContext::IsTor() const {
 }  // namespace content
 
 #include "../../../../content/browser/browser_context.cc"
-#include "brave/chromium_src/content/browser/tld_ephemeral_storage.cc"
+#include "brave/chromium_src/content/browser/tld_ephemeral_lifetime.cc"

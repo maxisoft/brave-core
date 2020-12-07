@@ -9,5 +9,6 @@ source_set("browser") {
     "//base",
     "//brave/content/browser/mojom",
     "//skia",
+    "//third_party/blink/public:blink_headers",
   ]
 }

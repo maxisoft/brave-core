@@ -14,16 +14,6 @@
 
 namespace net {
 
-namespace {
-
-CookieOptions OptionsWithoutEphemeralStorageURL(const CookieOptions& options) {
-  CookieOptions new_options(options);
-  new_options.top_frame_url_ = GURL();
-  return new_options;
-}
-
-}  // namespace
-
 CookieMonster::CookieMonster(scoped_refptr<PersistentCookieStore> store,
                              NetLog* net_log)
     : ChromiumCookieMonster(store, net_log),
@@ -53,40 +43,11 @@ CookieMonster::GetOrCreateEphemeralCookieStoreForTopFrameURL(
       .first->second.get();
 }
 
-void CookieMonster::SetCanonicalCookieAsync(
-    std::unique_ptr<CanonicalCookie> cookie,
-    const GURL& source_url,
-    const CookieOptions& options,
-    SetCookiesCallback callback) {
-  if (!options.top_frame_url_.is_empty()) {
-    ChromiumCookieMonster* ephemeral_monster =
-        GetOrCreateEphemeralCookieStoreForTopFrameURL(options.top_frame_url_);
-    ephemeral_monster->SetCanonicalCookieAsync(
-        std::move(cookie), source_url,
-        OptionsWithoutEphemeralStorageURL(options), std::move(callback));
-    return;
-  }
-  ChromiumCookieMonster::SetCanonicalCookieAsync(std::move(cookie), source_url,
-                                                 options, std::move(callback));
-}
-
-void CookieMonster::GetCookieListWithOptionsAsync(
-    const GURL& url,
-    const CookieOptions& options,
-    GetCookieListCallback callback) {
-  if (!options.top_frame_url_.is_empty()) {
-    ChromiumCookieMonster* ephemeral_monster =
-        GetOrCreateEphemeralCookieStoreForTopFrameURL(options.top_frame_url_);
-    ephemeral_monster->GetCookieListWithOptionsAsync(
-        url, OptionsWithoutEphemeralStorageURL(options), std::move(callback));
-    return;
-  }
-  ChromiumCookieMonster::GetCookieListWithOptionsAsync(url, options,
-                                                       std::move(callback));
-}
-
 void CookieMonster::DeleteCanonicalCookieAsync(const CanonicalCookie& cookie,
                                                DeleteCallback callback) {
+  for (auto& it : ephemeral_cookie_stores_) {
+    it.second->DeleteCanonicalCookieAsync(cookie, DeleteCallback());
+  }
   ChromiumCookieMonster::DeleteCanonicalCookieAsync(cookie,
                                                     std::move(callback));
 }
@@ -131,6 +92,29 @@ void CookieMonster::SetCookieableSchemes(
     it.second->SetCookieableSchemes(schemes, SetCookieableSchemesCallback());
   }
   ChromiumCookieMonster::SetCookieableSchemes(schemes, std::move(callback));
+}
+
+void CookieMonster::GetEphemeralCookieListWithOptionsAsync(
+    const GURL& url,
+    const GURL& top_frame_url,
+    const CookieOptions& options,
+    GetCookieListCallback callback) {
+  ChromiumCookieMonster* ephemeral_monster =
+      GetOrCreateEphemeralCookieStoreForTopFrameURL(top_frame_url);
+  ephemeral_monster->GetCookieListWithOptionsAsync(url, options,
+                                                   std::move(callback));
+}
+
+void CookieMonster::SetEphemeralCanonicalCookieAsync(
+    std::unique_ptr<CanonicalCookie> cookie,
+    const GURL& source_url,
+    const GURL& top_frame_url,
+    const CookieOptions& options,
+    SetCookiesCallback callback) {
+  ChromiumCookieMonster* ephemeral_monster =
+      GetOrCreateEphemeralCookieStoreForTopFrameURL(top_frame_url);
+  ephemeral_monster->SetCanonicalCookieAsync(std::move(cookie), source_url,
+                                             options, std::move(callback));
 }
 
 }  // namespace net

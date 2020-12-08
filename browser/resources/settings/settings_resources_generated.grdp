@@ -67,6 +67,12 @@
           preprocess="true"
           compress="false"
           type="BINDATA" />
+  <include name="IDR_SETTINGS_CHANGE_IPFS_GATEWAY_DIALOG_JS"
+          file="${root_gen_dir}/brave/browser/resources/settings/brave_default_extensions_page/change_ipfs_gateway_dialog.js"
+          use_base_dir="false"
+          preprocess="true"
+          compress="false"
+          type="BINDATA" />
   <include name="IDR_SETTINGS_BRAVE_SYNC_CODE_DIALOG_JS"
           file="${root_gen_dir}/brave/browser/resources/settings/brave_sync_page/brave_sync_code_dialog.js"
           use_base_dir="false"

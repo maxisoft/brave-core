@@ -109,6 +109,11 @@ LedgerDatabaseImpl::LedgerDatabaseImpl(const base::FilePath& path) :
 
 LedgerDatabaseImpl::~LedgerDatabaseImpl() = default;
 
+bool LedgerDatabaseImpl::OpenTemporaryForTesting() {
+  DCHECK(!db_.is_open());
+  return db_.OpenTemporary();
+}
+
 void LedgerDatabaseImpl::RunTransaction(
     type::DBTransactionPtr transaction,
     type::DBCommandResponse* command_response) {

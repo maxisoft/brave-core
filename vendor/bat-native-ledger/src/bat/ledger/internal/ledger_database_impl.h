@@ -26,6 +26,8 @@ class LedgerDatabaseImpl : public LedgerDatabase {
 
   ~LedgerDatabaseImpl() override;
 
+  bool OpenTemporaryForTesting();
+
   void RunTransaction(
       type::DBTransactionPtr transaction,
       type::DBCommandResponse* command_response) override;

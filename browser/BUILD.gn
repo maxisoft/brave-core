@@ -193,8 +193,10 @@ source_set("browser_process") {
     "//third_party/widevine/cdm:buildflags",
     "//ui/base",
   ]
-  sources += brave_content_public_browser_sources
-  deps += brave_content_public_browser_deps
+  if (is_component_build) {
+    sources += brave_content_public_browser_sources
+    deps += brave_content_public_browser_deps
+  }
 
   if (brave_wallet_enabled) {
     deps += [
